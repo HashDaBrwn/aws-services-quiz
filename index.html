@@ -1,0 +1,68 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row =>
+                    row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+                );
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Quiz Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="font-inter bg-gray-100 min-h-screen flex items-center justify-center">
+    <div id="start-screen" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">AWS Certification Quiz</h1>
+        <p class="mb-4 text-center">Enter the number of questions (1-128):</p>
+        <input id="question-count" type="number" min="1" max="128" class="w-full p-2 border rounded mb-4" placeholder="e.g., 10">
+        <button id="start-btn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Start Quiz</button>
+    </div>
+
+    <div id="quiz" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <div id="score" class="text-lg font-semibold mb-4">Score: 0/0</div>
+        <div id="question-container" class="text-xl mb-6"></div>
+        <div id="options-container" class="mb-6"></div>
+        <div id="result" class="mb-4"></div>
+        <div class="flex justify-between">
+            <button id="prev-btn" class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 disabled:bg-gray-300" disabled>Previous</button>
+            <button id="next-btn" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Next</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-2xl font-bold mb-4">Quiz Completed!</h2>
+        <div id="final-score" class="text-lg mb-4"></div>
+        <div id="category-results" class="mb-4"></div>
+        <button id="restart-btn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Restart Quiz</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* Ensure Inter font is applied globally */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Custom styles for radio buttons */
+input[type="radio"] {
+    accent-color: #2563eb; /* Blue color for radio buttons */
+}
+
+/* Ensure buttons have consistent padding */
+button {
+    transition: background-color 0.2s ease;
+}
+
+/* Add hover effects for disabled buttons */
+button:disabled:hover {
+    cursor: not-allowed;
+}
+
+/* Ensure result text wraps properly */
+#result {
+    word-wrap: break-word;
+}
