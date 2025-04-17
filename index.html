@@ -32,35 +32,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Quiz Application</title>
+    <title>AWS Certification Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="font-inter bg-gray-100 min-h-screen flex items-center justify-center">
-    <div id="start-screen" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-4 text-center">AWS Certification Quiz</h1>
-        <p class="mb-4 text-center">Enter the number of questions (1-128):</p>
-        <input id="question-count" type="number" min="1" max="128" class="w-full p-2 border rounded mb-4" placeholder="e.g., 10">
-        <button id="start-btn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Start Quiz</button>
+<body class="bg-gray-100 font-inter flex items-center justify-center min-h-screen">
+    <div id="start-screen" class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center mb-4">AWS Certification Quiz</h1>
+        <p class="text-center mb-4">Test your knowledge of AWS services!</p>
+        <div class="mb-4">
+            <label for="question-count" class="block text-sm font-medium text-gray-700">Number of Questions (1-128):</label>
+            <input type="number" id="question-count" min="1" max="128" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        <button id="start-btn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Start Quiz</button>
     </div>
 
-    <div id="quiz" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+    <div id="quiz" class="hidden bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         <div id="score" class="text-lg font-semibold mb-4">Score: 0/0</div>
-        <div id="question-container" class="text-xl mb-6"></div>
-        <div id="options-container" class="mb-6"></div>
-        <div id="result" class="mb-4"></div>
-        <div class="flex justify-between">
-            <button id="prev-btn" class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 disabled:bg-gray-300" disabled>Previous</button>
-            <button id="next-btn" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Next</button>
+        <div id="question-number" class="text-lg font-semibold mb-2"></div>
+        <div id="question-text" class="mb-4"></div>
+        <div id="options" class="space-y-2"></div>
+        <div id="result" class="mt-4"></div>
+        <div id="feedback" class="mt-4 hidden">
+            <p id="correct-answer" class="font-semibold"></p>
+            <p id="definition"></p>
+            <p id="incorrect-explanation"></p>
+        </div>
+        <div class="mt-6 flex justify-between">
+            <button id="prev-btn" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 disabled:opacity-50">Previous</button>
+            <button id="submit-btn" class="hidden bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Submit</button>
+            <button id="next-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Next</button>
         </div>
     </div>
 
-    <div id="results-screen" class="hidden bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 class="text-2xl font-bold mb-4">Quiz Completed!</h2>
+    <div id="results-screen" class="hidden bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-xl font-bold mb-4">Quiz Results</h2>
         <div id="final-score" class="text-lg mb-4"></div>
         <div id="category-results" class="mb-4"></div>
-        <button id="restart-btn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Restart Quiz</button>
+        <div class="flex justify-between">
+            <button id="restart-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Restart Quiz</button>
+            <button id="review-btn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">Review Quiz</button>
+        </div>
+    </div>
+
+    <div id="review-screen" class="hidden bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-xl font-bold mb-4">Review Your Answers</h2>
+        <div id="review-questions" class="mb-4"></div>
+        <div class="flex justify-between">
+            <button id="review-prev-btn" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 disabled:opacity-50">Previous</button>
+            <button id="review-next-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Next</button>
+        </div>
+        <button id="back-to-results-btn" class="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Back to Results</button>
     </div>
 
     <script src="script.js"></script>

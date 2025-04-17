@@ -2,25 +2,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const startScreen = document.getElementById('start-screen');
     const quiz = document.getElementById('quiz');
     const resultsScreen = document.getElementById('results-screen');
-    const questionContainer = document.getElementById('question-container');
-    const optionsContainer = document.getElementById('options-container');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const result = document.getElementById('result');
-    const scoreDisplay = document.getElementById('score');
-    const questionCountInput = document.getElementById('question-count');
+    const reviewScreen = document.getElementById('review-screen');
     const startBtn = document.getElementById('start-btn');
-    const restartBtn = document.getElementById('restart-btn');
+    const questionCountInput = document.getElementById('question-count');
+    const questionNumber = document.getElementById('question-number');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options');
+    const result = document.getElementById('result');
+    const feedback = document.getElementById('feedback');
+    const correctAnswer = document.getElementById('correct-answer');
+    const definition = document.getElementById('definition');
+    const incorrectExplanation = document.getElementById('incorrect-explanation');
+    const prevBtn = document.getElementById('prev-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreDisplay = document.getElementById('score');
     const finalScore = document.getElementById('final-score');
     const categoryResults = document.getElementById('category-results');
+    const restartBtn = document.getElementById('restart-btn');
+    const reviewBtn = document.getElementById('review-btn');
+    const reviewQuestions = document.getElementById('review-questions');
+    const reviewPrevBtn = document.getElementById('review-prev-btn');
+    const reviewNextBtn = document.getElementById('review-next-btn');
+    const backToResultsBtn = document.getElementById('back-to-results-btn');
 
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let selectedQuestions = [];
-    let userAnswers = [];
-    let totalQuestions = 0;
-
-    const questions = [
+    let questions = [
         {
             "id": 1, "category": "Analytics", 
             "question": "You need to run SQL queries on data stored in S3 without managing servers. Which service should you use?", 
@@ -1559,50 +1565,116 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    let selectedQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let totalQuestions = 0;
+    let userAnswers = [];
+    let currentReviewPage = 0;
+    const questionsPerPage = 10;
+
     startBtn.addEventListener('click', () => {
-        totalQuestions = parseInt(questionCountInput.value);
-        if (totalQuestions < 1 || totalQuestions > questions.length) {
-            alert(`Please enter a number between 1 and ${questions.length}`);
+        const count = parseInt(questionCountInput.value);
+        if (isNaN(count) || count < 1 || count > 128) {
+            alert('Please enter a number between 1 and 128');
             return;
         }
-        selectedQuestions = questions.sort(() => Math.random() - 0.5).slice(0, totalQuestions);
+        totalQuestions = count;
+        selectedQuestions = questions.sort(() => Math.random() - 0.5).slice(0, count);
         currentQuestionIndex = 0;
         score = 0;
         userAnswers = [];
         startScreen.classList.add('hidden');
         quiz.classList.remove('hidden');
+        scoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
         showQuestion();
     });
 
-    nextBtn.addEventListener('click', () => {
-        const selectedOption = document.querySelector('input[name="option"]:checked');
-        if (!selectedOption) {
+    function showQuestion() {
+        const currentQuestion = selectedQuestions[currentQuestionIndex];
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1}:`;
+        questionText.textContent = currentQuestion.question;
+        optionsContainer.innerHTML = '';
+        result.textContent = '';
+        feedback.classList.add('hidden');
+        submitBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+
+        currentQuestion.options.forEach(option => {
+            const label = document.createElement('label');
+            label.className = 'block';
+            label.innerHTML = `
+                <input type="radio" name="option" value="${option}" class="mr-2">
+                ${option}
+            `;
+            optionsContainer.appendChild(label);
+        });
+
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.textContent = currentQuestionIndex === totalQuestions - 1 ? 'Finish' : 'Next';
+
+        const prevAnswer = userAnswers[currentQuestionIndex];
+        if (prevAnswer) {
+            const radioButtons = document.querySelectorAll('input[name="option"]');
+            radioButtons.forEach(radio => {
+                if (radio.value === prevAnswer.selected) {
+                    radio.checked = true;
+                    submitBtn.classList.remove('hidden');
+                    nextBtn.classList.add('hidden');
+                }
+            });
+        }
+
+        optionsContainer.addEventListener('change', () => {
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+        }, { once: true });
+    }
+
+    submitBtn.addEventListener('click', () => {
+        const userAnswer = document.querySelector('input[name="option"]:checked');
+        if (!userAnswer) {
             alert('Please select an option!');
             return;
         }
-        const userAnswer = selectedOption.value;
+
         const currentQuestion = selectedQuestions[currentQuestionIndex];
-        if (userAnswers[currentQuestionIndex]) {
-            if (userAnswers[currentQuestionIndex].selected === currentQuestion.answer) {
-                score--;
-            }
-        }
-        userAnswers[currentQuestionIndex] = { question: currentQuestion, selected: userAnswer };
-        if (userAnswer === currentQuestion.answer) {
+        const isCorrect = userAnswer.value === currentQuestion.answer;
+
+        userAnswers[currentQuestionIndex] = {
+            selected: userAnswer.value,
+            isCorrect: isCorrect
+        };
+
+        result.textContent = isCorrect ? 'Correct!' : 'Incorrect.';
+        result.classList.add(isCorrect ? 'text-green-500' : 'text-red-500');
+
+        if (isCorrect) {
             score++;
-            result.textContent = 'Correct! ' + currentQuestion.definition;
-            result.classList.remove('text-red-500');
-            result.classList.add('text-green-500');
+            scoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
         } else {
-            result.textContent = `Incorrect. ${currentQuestion.definition} ${currentQuestion.incorrect_explanations[userAnswer]}`;
-            result.classList.remove('text-green-500');
-            result.classList.add('text-red-500');
+            feedback.classList.remove('hidden');
+            correctAnswer.textContent = `Correct Answer: ${currentQuestion.answer}`;
+            definition.textContent = `Definition: ${currentQuestion.definition}`;
+            incorrectExplanation.textContent = `Why Incorrect: ${currentQuestion.incorrect_explanations[userAnswer.value] || 'No specific explanation available.'}`;
         }
-        scoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
+
+        submitBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (!userAnswers[currentQuestionIndex]) {
+            alert('Please submit an answer!');
+            return;
+        }
+
         currentQuestionIndex++;
-        if (currentQuestionIndex < selectedQuestions.length) {
+        if (currentQuestionIndex < totalQuestions) {
             showQuestion();
         } else {
+            quiz.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
             showResults();
         }
     });
@@ -1618,34 +1690,36 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsScreen.classList.add('hidden');
         startScreen.classList.remove('hidden');
         questionCountInput.value = '';
-        result.textContent = '';
         scoreDisplay.textContent = 'Score: 0/0';
-        categoryResults.innerHTML = '';
     });
 
-    function showQuestion() {
-        result.textContent = '';
-        result.classList.remove('text-green-500', 'text-red-500');
-        const currentQuestion = selectedQuestions[currentQuestionIndex];
-        questionContainer.textContent = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
-        optionsContainer.innerHTML = '';
-        currentQuestion.options.forEach(option => {
-            const label = document.createElement('label');
-            label.classList.add('block', 'my-2');
-            const isChecked = userAnswers[currentQuestionIndex] && userAnswers[currentQuestionIndex].selected === option ? 'checked' : '';
-            label.innerHTML = `
-                <input type="radio" name="option" value="${option}" class="mr-2" ${isChecked}>
-                ${option}
-            `;
-            optionsContainer.appendChild(label);
-        });
-        prevBtn.disabled = currentQuestionIndex === 0;
-        nextBtn.textContent = currentQuestionIndex === selectedQuestions.length - 1 ? 'Finish' : 'Next';
-    }
+    reviewBtn.addEventListener('click', () => {
+        resultsScreen.classList.add('hidden');
+        reviewScreen.classList.remove('hidden');
+        currentReviewPage = 0;
+        showReview();
+    });
+
+    backToResultsBtn.addEventListener('click', () => {
+        reviewScreen.classList.add('hidden');
+        resultsScreen.classList.remove('hidden');
+    });
+
+    reviewPrevBtn.addEventListener('click', () => {
+        if (currentReviewPage > 0) {
+            currentReviewPage--;
+            showReview();
+        }
+    });
+
+    reviewNextBtn.addEventListener('click', () => {
+        if ((currentReviewPage + 1) * questionsPerPage < totalQuestions) {
+            currentReviewPage++;
+            showReview();
+        }
+    });
 
     function showResults() {
-        quiz.classList.add('hidden');
-        resultsScreen.classList.remove('hidden');
         finalScore.textContent = `Your final score is ${score}/${totalQuestions} (${((score / totalQuestions) * 100).toFixed(2)}%)`;
 
         const categoryScores = {};
@@ -1655,7 +1729,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoryScores[category] = { correct: 0, total: 0 };
             }
             categoryScores[category].total++;
-            if (userAnswers[index] && userAnswers[index].selected === q.answer) {
+            if (userAnswers[index] && userAnswers[index].isCorrect) {
                 categoryScores[category].correct++;
             }
         });
@@ -1667,5 +1741,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${category}: ${correct}/${total} (${percentage}%)</p>
             `;
         }
+    }
+
+    function showReview() {
+        reviewQuestions.innerHTML = '';
+        const startIndex = currentReviewPage * questionsPerPage;
+        const endIndex = Math.min(startIndex + questionsPerPage, totalQuestions);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            const question = selectedQuestions[i];
+            const answer = userAnswers[i];
+            const questionBlock = document.createElement('div');
+            questionBlock.className = 'question-block';
+            questionBlock.innerHTML = `
+                <p class="font-semibold">Question ${i + 1}: ${question.question}</p>
+                <p>Your Answer: ${answer.selected} <span class="${answer.isCorrect ? 'correct' : 'incorrect'}">(${answer.isCorrect ? 'Correct' : 'Incorrect'})</span></p>
+                ${!answer.isCorrect ? `
+                    <p>Correct Answer: ${question.answer}</p>
+                    <p>Definition: ${question.definition}</p>
+                    <p>Why Incorrect: ${question.incorrect_explanations[answer.selected] || 'No specific explanation available.'}</p>
+                ` : `
+                    <p>Definition: ${question.definition}</p>
+                `}
+            `;
+            reviewQuestions.appendChild(questionBlock);
+        }
+
+        reviewPrevBtn.disabled = currentReviewPage === 0;
+        reviewNextBtn.disabled = endIndex >= totalQuestions;
     }
 });
