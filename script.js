@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedback = document.getElementById('feedback');
     const correctAnswer = document.getElementById('correct-answer');
     const definition = document.getElementById('definition');
-    const incorrectExplanation = document.getElementById('incorrect-explanation');
+    const incorrectExplanations = document.getElementById('incorrect-explanations');
     const prevBtn = document.getElementById('prev-btn');
     const submitBtn = document.getElementById('submit-btn');
     const nextBtn = document.getElementById('next-btn');
@@ -1656,7 +1656,15 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.classList.remove('hidden');
             correctAnswer.textContent = `Correct Answer: ${currentQuestion.answer}`;
             definition.textContent = `Definition: ${currentQuestion.definition}`;
-            incorrectExplanation.textContent = `Why Incorrect: ${currentQuestion.incorrect_explanations[userAnswer.value] || 'No specific explanation available.'}`;
+            incorrectExplanations.innerHTML = '';
+            for (const [option, explanation] of Object.entries(currentQuestion.incorrect_explanations)) {
+                const explanationDiv = document.createElement('div');
+                explanationDiv.innerHTML = `
+                    <span class="option">${option}:</span>
+                    <span class="explanation">${explanation}</span>
+                `;
+                incorrectExplanations.appendChild(explanationDiv);
+            }
         }
 
         submitBtn.classList.add('hidden');
@@ -1759,7 +1767,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${!answer.isCorrect ? `
                     <p>Correct Answer: ${question.answer}</p>
                     <p>Definition: ${question.definition}</p>
-                    <p>Why Incorrect: ${question.incorrect_explanations[answer.selected] || 'No specific explanation available.'}</p>
+                    <div class="incorrect-explanations">
+                        ${Object.entries(question.incorrect_explanations).map(([option, explanation]) => `
+                            <div>
+                                <span class="option">${option}:</span>
+                                <span class="explanation">${explanation}</span>
+                            </div>
+                        `).join('')}
+                    </div>
                 ` : `
                     <p>Definition: ${question.definition}</p>
                 `}

@@ -55,9 +55,9 @@
         <div id="options" class="space-y-2"></div>
         <div id="result" class="mt-4"></div>
         <div id="feedback" class="mt-4 hidden">
-            <p id="correct-answer" class="font-semibold"></p>
-            <p id="definition"></p>
-            <p id="incorrect-explanation"></p>
+            <p id="correct-answer" class="font-semibold mb-2"></p>
+            <p id="definition" class="mb-2"></p>
+            <div id="incorrect-explanations" class="space-y-2"></div>
         </div>
         <div class="mt-6 flex justify-between">
             <button id="prev-btn" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 disabled:opacity-50">Previous</button>
@@ -78,7 +78,7 @@
 
     <div id="review-screen" class="hidden bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         <h2 class="text-xl font-bold mb-4">Review Your Answers</h2>
-        <div id="review-questions" class="mb-4"></div>
+        <div id="review-questions" class="mb-4 space-y-4"></div>
         <div class="flex justify-between">
             <button id="review-prev-btn" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 disabled:opacity-50">Previous</button>
             <button id="review-next-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Next</button>
