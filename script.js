@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.getElementById('prev-btn');
     const submitBtn = document.getElementById('submit-btn');
     const nextBtn = document.getElementById('next-btn');
-    const scoreDisplay = document.getElementById('score');
     const finalScore = document.getElementById('final-score');
     const categoryResults = document.getElementById('category-results');
     const restartBtn = document.getElementById('restart-btn');
@@ -1586,7 +1585,6 @@ document.addEventListener('DOMContentLoaded', () => {
         userAnswers = [];
         startScreen.classList.add('hidden');
         quiz.classList.remove('hidden');
-        scoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
         showQuestion();
     });
 
@@ -1646,12 +1644,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isCorrect: isCorrect
         };
 
-        result.textContent = isCorrect ? 'Correct!' : 'Incorrect.';
-        result.classList.add(isCorrect ? 'text-green-500' : 'text-red-500');
+        result.textContent = isCorrect ? 'Correct! 🎉' : 'Incorrect. ❌';
+        result.classList.add(isCorrect ? 'correct' : 'incorrect');
 
         if (isCorrect) {
             score++;
-            scoreDisplay.textContent = `Score: ${score}/${totalQuestions}`;
         } else {
             feedback.classList.remove('hidden');
             correctAnswer.textContent = `Correct Answer: ${currentQuestion.answer}`;
@@ -1698,7 +1695,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsScreen.classList.add('hidden');
         startScreen.classList.remove('hidden');
         questionCountInput.value = '';
-        scoreDisplay.textContent = 'Score: 0/0';
     });
 
     reviewBtn.addEventListener('click', () => {
@@ -1763,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             questionBlock.className = 'question-block';
             questionBlock.innerHTML = `
                 <p class="font-semibold">Question ${i + 1}: ${question.question}</p>
-                <p>Your Answer: ${answer.selected} <span class="${answer.isCorrect ? 'correct' : 'incorrect'}">(${answer.isCorrect ? 'Correct' : 'Incorrect'})</span></p>
+                <p>Your Answer: ${answer.selected} <span class="${answer.isCorrect ? 'correct' : 'incorrect'}">(${answer.isCorrect ? 'Correct! 🎉' : 'Incorrect. ❌'})</span></p>
                 ${!answer.isCorrect ? `
                     <p>Correct Answer: ${question.answer}</p>
                     <p>Definition: ${question.definition}</p>
